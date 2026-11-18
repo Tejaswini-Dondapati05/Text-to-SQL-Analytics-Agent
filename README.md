@@ -1,70 +1,206 @@
-# Text-to-SQL Analytics Agent
 
-An agentic AI app that turns plain-English business questions into SQL, validates the query,
-fixes its own errors, and returns the result with a chart and a plain-language summary.
+# 🚀 Text-to-SQL Analytics Agent
 
-**Tech stack:** Python, LangChain, LangGraph, Gemini (LLM), SQLite, FastAPI, Streamlit, Pandas, Matplotlib
+### AI-Powered Natural Language to SQL Analytics System
 
-## How it works
+An intelligent AI-powered analytics application that converts natural language questions into SQL queries and provides meaningful business insights.
 
+Built using **Google Gemini, LangGraph, LangChain, FastAPI, Streamlit, and SQLite**, this project enables users to interact with databases using simple English without writing SQL manually.
+
+## ✨ Key Features
+
+- 🤖 **Natural Language to SQL:** Convert English questions into SQL queries.
+- 🧠 **AI-Powered SQL Generation:** Generate SQL using Google Gemini.
+- 🔄 **Self-Correction:** Automatically fix SQL errors using LLM feedback (up to 3 attempts).
+- 🛡️ **SQL Validation:** Restrict queries to read-only SELECT statements.
+- ⚡ **Safe Query Execution:** Execute queries using a read-only SQLite connection.
+- 📊 **Data Visualization:** Display query results using charts and tables.
+- 💡 **AI Business Insights:** Generate easy-to-understand summaries.
+- 🌐 **FastAPI Backend:** Provide REST API access.
+- 🎨 **Streamlit Interface:** Interactive user-friendly dashboard.
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Python | Core programming |
+| Google Gemini | AI-powered SQL generation |
+| LangChain | LLM integration |
+| LangGraph | Agent workflow orchestration |
+| SQLite | Database management |
+| FastAPI | Backend API |
+| Streamlit | Interactive frontend |
+| Pandas | Data processing |
+| Matplotlib | Data visualization |
+
+## 🏗️ System Architecture
+
+```text
+       User Question
+             |
+             v
+       Get Database Schema
+             |
+             v
+       Generate SQL (Gemini)
+             |
+             v
+       Validate SQL Query
+             |
+             v
+       Execute SQL Query
+             |
+       +-----+------+
+       |            |
+     Error        Success
+       |            |
+       v            v
+  Send Error     Summarize
+  to Gemini      Results
+       |            |
+       v            v
+  Regenerate     Final Answer
+      SQL         + Chart
+       |
+   Max 3 Attempts
 ```
-Question -> get_schema -> generate_sql -> validate -> execute -> summarize -> answer
-                              ^              |           |
-                              |__ error feedback (max 3 tries) __|
+
+## 🔄 Agent Workflow
+
+The LangGraph agent follows these steps:
+
+1. **Get Schema:** Retrieves database tables and columns.
+2. **Generate SQL:** Gemini generates SQL based on the user's question.
+3. **Validate:** Checks that the generated query follows read-only SQL rules.
+4. **Execute:** Runs the query against SQLite.
+5. **Self-Correction:** Sends validation or execution errors back to Gemini for correction, up to three attempts.
+6. **Summarize:** Generates a business-friendly explanation of the results.
+7. **Visualize:** Streamlit displays the results in tables and charts.
+
+## 📁 Project Structure
+
+```text
+Text-to-SQL-Analytics-Agent/
+│
+├── agent.py
+├── api.py
+├── app.py
+├── db.py
+├── check_models.py
+├── test_gemini.py
+├── requirements.txt
+├── README.md
+├── .gitignore
+└── sales.db (generated locally)
 ```
 
-1. **get_schema** reads table and column names from the database.
-2. **generate_sql** sends the schema + question to Gemini and gets a SQL query.
-3. **validate** allows only a single read-only SELECT query (blocks DROP, DELETE, UPDATE, etc.).
-4. **execute** runs the query on a read-only database connection.
-5. If validation or execution fails, the error is sent back to the LLM to correct the SQL (self-correction loop, 3 attempts).
-6. **summarize** asks the LLM to explain the result in 2-3 sentences.
-7. Streamlit shows the SQL, summary, table and a chart.
+## ⚙️ Installation and Setup
 
-## Setup (step by step)
+### 1. Clone the repository
 
-1. Install Python 3.10 or newer.
-2. Open a terminal in this folder and create a virtual environment:
-   - Windows: `python -m venv venv` then `venv\Scripts\activate`
-   - Mac/Linux: `python3 -m venv venv` then `source venv/bin/activate`
-3. Install packages: `pip install -r requirements.txt`
-4. Get a free Gemini API key from Google AI Studio.
-5. Copy `.env.example` to `.env` and paste your key after `GOOGLE_API_KEY=`.
-6. Create the sample database: `python db.py` (creates `sales.db` and prints the schema).
-7. Test the agent without the UI: `python agent.py`
-8. Start the API (terminal 1): `uvicorn api:app --reload`
-9. Start the UI (terminal 2, same folder, venv active): `streamlit run app.py`
-10. Open the link Streamlit shows (usually http://localhost:8501) and ask questions.
+```bash
+git clone https://github.com/Tejaswini-Dondapati05/Text-to-SQL-Analytics-Agent.git
 
-## Sample questions to try
+cd Text-to-SQL-Analytics-Agent
+```
+
+### 2. Create virtual environment
+
+```bash
+python -m venv venv
+```
+
+Activate it:
+
+**Windows**
+```bash
+venv\Scripts\activate
+```
+
+**Mac/Linux**
+```bash
+source venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure Gemini API Key
+
+Create a `.env` file in the project folder:
+
+```env
+GOOGLE_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-3.5-flash-lite
+```
+
+Replace the API key with your own valid Google AI Studio API key. Use a model currently available to your API account.
+
+### 5. Initialize the database
+
+```bash
+python db.py
+```
+
+### 6. Run the FastAPI backend
+
+```bash
+uvicorn api:app --reload
+```
+
+API documentation:
+
+http://127.0.0.1:8000/docs
+
+### 7. Run the Streamlit application
+
+Open another terminal and activate the virtual environment.
+
+```bash
+streamlit run app.py
+```
+
+Open:
+
+http://localhost:8501
+
+## 💬 Sample Questions
+
+Try asking these questions:
 
 - Which 5 products have the highest revenue?
-- Show total revenue by category
+- Show total revenue by category.
 - How many orders were placed each month in 2025?
 - Which city has the most customers?
 - What percentage of orders were cancelled?
 - Who are the top 3 customers by total spending?
 - Which category sells the most in Hyderabad?
 
-Also try: "Delete all orders" (it should be blocked) to show the safety check.
+## 🔐 Security Features
 
-## Files
+- Only read-only SQL queries are permitted.
+- Multiple SQL statements are rejected.
+- Dangerous SQL keywords are blocked.
+- Database queries execute using a read-only connection.
+- SQL validation and execution errors are used for self-correction.
 
-| File | Purpose |
-|---|---|
-| `db.py` | Creates the sample database, reads the schema, runs read-only queries |
-| `agent.py` | LangGraph workflow (nodes, routing, self-correction loop) |
-| `api.py` | FastAPI backend with `POST /ask` |
-| `app.py` | Streamlit user interface |
+**Note:** This is a demonstration-level SQL safety layer, not a complete production SQL security system.
 
-## Use your own data
+## 🎯 Project Objective
 
-Replace the tables in `db.py` (or point `DB_PATH` to your own SQLite file). The agent reads
-the schema automatically, so no other change is needed. If you load a CSV with Pandas, use
-`df.to_sql("table_name", connection)`.
+The main objective is to simplify business data analysis by allowing users to interact with databases using natural language.
 
-## Common problems
+This project demonstrates practical applications of Generative AI, LLM-based agents, database automation, API development, and data visualization.
 
-- **Model not found / 404:** change `GEMINI_MODEL` in `.env` to a current model name from Google AI Studio.
-- **Could not reach the API:** the FastAPI server (step 8) must be running first.
-- **503 or rate-limit error from Gemini:** wait a few seconds and try again.
+## 👩‍💻 Author
+
+**Tejaswini Dondapati**
+
+GitHub: [Tejaswini-Dondapati05](https://github.com/Tejaswini-Dondapati05)
+
+## ⭐ Support
+
+If you find this project useful, consider giving it a ⭐ on GitHub!
