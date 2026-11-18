@@ -1,4 +1,3 @@
-
 # 🚀 Text-to-SQL Analytics Agent
 
 ### AI-Powered Natural Language to SQL Analytics System
